@@ -151,6 +151,69 @@ def search_legislation():
             'error': str(e)
         }), 500
 
+@app.route('/api/search/wac', methods=['POST'])
+def search_wac():
+    """Search Washington Administrative Code with AI guidance"""
+    try:
+        data = request.json
+        search_term = data.get('search_term', '').strip()
+        
+        if not search_term:
+            return jsonify({
+                'success': False,
+                'error': 'Please enter a WAC section or topic'
+            }), 400
+        
+        # Use AI to provide WAC guidance
+        from anthropic import Anthropic
+        
+        api_key = os.getenv('ANTHROPIC_API_KEY')
+        if not api_key:
+            raise Exception("ANTHROPIC_API_KEY not found")
+        
+        client = Anthropic(api_key=api_key)
+        
+        prompt = f"""You are an expert on Washington State Administrative Code (WAC). A user is searching for: "{search_term}"
+
+Provide helpful guidance in the following format:
+
+1. **What this WAC section covers**: Brief explanation of what this area of administrative code regulates
+2. **Administering agency**: Which state agency is responsible for this WAC section
+3. **Related RCW sections**: Which Revised Code of Washington sections authorize these rules
+4. **Common WAC citations in this area**: List 3-5 specific WAC section numbers they might want to look up
+5. **How to access**: Direct them to apps.leg.wa.gov/wac/ with the specific citation
+6. **Pro tip**: One insider tip about navigating WAC in this area
+
+Be specific, actionable, and concise. If they provided a specific WAC citation (e.g., "246-12-010"), explain what that exact section covers."""
+
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1500,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        wac_guidance = response.content[0].text
+        
+        return jsonify({
+            'success': True,
+            'data': [{
+                'BillId': '📜 WAC Search Assistant',
+                'LongDescription': wac_guidance,
+                'ShortDescription': f'Washington Administrative Code guidance for: "{search_term}"',
+                'PrimeSponsorName': 'Claude AI',
+                'CurrentStatus': {
+                    'BillStatus': 'Administrative Rules Analysis'
+                }
+            }]
+        })
+        
+    except Exception as e:
+        logging.error(f"WAC search error: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'WAC search error: {str(e)}'
+        }), 500
+
 @app.route('/api/search/rcw', methods=['POST'])
 def search_rcw():
     """Search for bills affecting specific RCW sections"""
