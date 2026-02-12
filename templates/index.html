@@ -60,6 +60,10 @@
                         <span class="tab-icon">⚖️</span>
                         RCW Citations
                     </button>
+                    <button class="tab-button" data-tab="wac">
+                        <span class="tab-icon">📜</span>
+                        WAC (Admin Code)
+                    </button>
                     <button class="tab-button" data-tab="committees">
                         <span class="tab-icon">👥</span>
                         Committees
@@ -99,6 +103,25 @@
                     </div>
                     <div class="search-help">
                         <p><strong>Find bills that affect specific RCW sections</strong></p>
+                    </div>
+                </div>
+
+                <!-- WAC Tab -->
+                <div class="tab-content" data-tab-content="wac">
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="wac-search" 
+                            class="search-input" 
+                            placeholder="Enter WAC section or topic (e.g., 246-12-010, food safety)..."
+                        >
+                        <button id="search-wac-btn" class="search-button">
+                            Search
+                        </button>
+                    </div>
+                    <div class="search-help">
+                        <p><strong>Search Washington Administrative Code</strong></p>
+                        <p>Examples: 246-12-010 (food service), 296-17A (workers comp), environmental regulations</p>
                     </div>
                 </div>
 
