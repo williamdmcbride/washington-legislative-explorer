@@ -281,9 +281,23 @@ def get_committees():
         client = Client(COMMITTEE_SERVICE)
         result = client.service.GetCommittees(biennium='2023-24')
         
+        # Convert zeep objects to dictionaries
+        committees = []
+        if result:
+            if not isinstance(result, list):
+                result = [result]
+            
+            for committee in result:
+                committees.append({
+                    'Name': str(committee.Name) if hasattr(committee, 'Name') else 'Unknown',
+                    'LongName': str(committee.LongName) if hasattr(committee, 'LongName') else '',
+                    'Agency': str(committee.Agency) if hasattr(committee, 'Agency') else '',
+                    'Id': str(committee.Id) if hasattr(committee, 'Id') else '',
+                })
+        
         return jsonify({
             'success': True,
-            'data': result
+            'data': committees
         })
         
     except Exception as e:
