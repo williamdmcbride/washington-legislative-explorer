@@ -64,6 +64,10 @@
                         <span class="tab-icon">📜</span>
                         WAC (Admin Code)
                     </button>
+                    <button class="tab-button" data-tab="kittitas">
+                        <span class="tab-icon">🏛️</span>
+                        Kittitas County
+                    </button>
                     <button class="tab-button" data-tab="committees">
                         <span class="tab-icon">👥</span>
                         Committees
@@ -122,6 +126,25 @@
                     <div class="search-help">
                         <p><strong>Search Washington Administrative Code</strong></p>
                         <p>Examples: 246-12-010 (food service), 296-17A (workers comp), environmental regulations</p>
+                    </div>
+                </div>
+
+                <!-- Kittitas County Tab -->
+                <div class="tab-content" data-tab-content="kittitas">
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="kittitas-search" 
+                            class="search-input" 
+                            placeholder="Enter topic or code section (e.g., building permits, zoning, KCC 17.15)..."
+                        >
+                        <button id="search-kittitas-btn" class="search-button">
+                            Search
+                        </button>
+                    </div>
+                    <div class="search-help">
+                        <p><strong>Search Kittitas County Code</strong></p>
+                        <p>Examples: building codes, zoning regulations, KCC 14.04 (building), KCC 17.15 (zoning)</p>
                     </div>
                 </div>
 
