@@ -53,30 +53,18 @@ def strip_all_html_from_text(text):
     # Remove everything between < and >
     text = re.sub(r'<[^>]*>', '', text)
     
-    # Target the EXACT pattern: target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">WAC
-    # This regex finds the whole chunk and replaces it with just "WAC"
-    text = re.sub(
-        r'target="_blank"\s+rel="noopener noreferrer"\s+style="color:\s*#[0-9a-fA-F]+;\s*text-decoration:\s*underline;"\s*>\s*(WAC|RCW)',
-        r'\1',
-        text
-    )
+    # Remove target="_blank" and similar attributes even without tags
+    text = re.sub(r'target\s*=\s*["\'][^"\']*["\']', '', text)
+    text = re.sub(r'rel\s*=\s*["\'][^"\']*["\']', '', text)
+    text = re.sub(r'style\s*=\s*["\'][^"\']*["\']', '', text)
+    text = re.sub(r'href\s*=\s*["\'][^"\']*["\']', '', text)
+    text = re.sub(r'class\s*=\s*["\'][^"\']*["\']', '', text)
     
-    # Also handle variations without the > at the end
-    text = re.sub(
-        r'target="_blank"\s+rel="noopener noreferrer"\s+style="[^"]*"\s*',
-        '',
-        text
-    )
+    # Remove stray > characters that appear before WAC or RCW
+    text = re.sub(r'>\s*(WAC|RCW|KCC)', r'\1', text)
     
-    # Remove individual HTML attributes as standalone text
-    text = re.sub(r'\s+target="_blank"', '', text)
-    text = re.sub(r'\s+rel="[^"]*"', '', text)
-    text = re.sub(r'\s+style="[^"]*"', '', text)
-    text = re.sub(r'\s+href="[^"]*"', '', text)
-    text = re.sub(r'\s+class="[^"]*"', '', text)
-    
-    # Remove stray > characters near WAC/RCW
-    text = re.sub(r'>\s*(WAC|RCW)', r' \1', text)
+    # Clean up any remaining quotes and angle brackets
+    text = re.sub(r'["\']?\s*>', '', text)
     
     # Fix multiple spaces
     text = re.sub(r'  +', ' ', text)
@@ -284,6 +272,89 @@ CRITICAL FORMATTING RULES:
         return jsonify({
             'success': False,
             'error': f'WAC search error: {error_msg}'
+        }), 500
+
+@app.route('/api/search/kittitas', methods=['POST'])
+def search_kittitas():
+    """Search Kittitas County Code with AI guidance"""
+    try:
+        data = request.json
+        search_term = data.get('search_term', '').strip()
+        
+        if not search_term:
+            return jsonify({
+                'success': False,
+                'error': 'Please enter a topic or code section'
+            }), 400
+        
+        # Use AI to provide Kittitas County guidance
+        from anthropic import Anthropic
+        
+        api_key = os.getenv('ANTHROPIC_API_KEY')
+        if not api_key:
+            raise Exception("ANTHROPIC_API_KEY not found")
+        
+        client = Anthropic(api_key=api_key)
+        
+        prompt = f"""You are an expert on Kittitas County, Washington regulations and codes. A user is searching for: "{search_term}"
+
+Provide helpful guidance in this format:
+
+**What this covers in Kittitas County**
+Brief explanation of how this topic is regulated at the county level.
+
+**Relevant county departments**
+Which Kittitas County departments handle this (e.g., Planning, Building & Fire Safety, Public Works)
+
+**Related county code sections**
+List 3-5 relevant Kittitas County Code (KCC) sections:
+1. KCC 14.04 (Building Code)
+2. KCC 17.15 (Zoning/Allowed Uses)
+3. KCC 18.01 (Code Enforcement)
+
+**State code connections**
+How this relates to Washington State RCW or WAC:
+- RCW sections that apply
+- WAC sections Kittitas County enforces
+
+**How to access county code**
+Visit co.kittitas.wa.us/boc/countycode/ for the full Kittitas County Code.
+
+**Local tip**
+One practical tip about navigating Kittitas County regulations.
+
+FORMATTING RULES:
+- Use numbered lists for code sections
+- Write "KCC 14.04" or "RCW 19.27" as plain text
+- NO HTML tags or markup
+- Clear line breaks between sections"""
+
+        kittitas_guidance = call_claude_api_with_retry(client, prompt, max_tokens=1500)
+        
+        # Apply HTML cleaning
+        kittitas_guidance = strip_all_html_from_text(kittitas_guidance)
+        
+        return jsonify({
+            'success': True,
+            'data': [{
+                'BillId': '🏛️ Kittitas County Assistant',
+                'LongDescription': kittitas_guidance,
+                'ShortDescription': f'Kittitas County guidance for: "{search_term}"',
+                'PrimeSponsorName': 'Claude AI',
+                'CurrentStatus': {
+                    'BillStatus': 'County Code Analysis'
+                }
+            }]
+        })
+        
+    except Exception as e:
+        logging.error(f"Kittitas search error: {e}")
+        error_msg = str(e)
+        if "overloaded" in error_msg.lower():
+            error_msg = "Claude AI is experiencing high demand. Please try again in a few moments."
+        return jsonify({
+            'success': False,
+            'error': f'Kittitas County search error: {error_msg}'
         }), 500
 
 @app.route('/api/search/rcw', methods=['POST'])
