@@ -251,7 +251,7 @@ function displayResults(results) {
         }
         
         if (result.ShortDescription) {
-            html += `<div class="result-description"><em>${result.ShortDescription}</em></div>`;
+            html += `<div class="result-description"><em>${formatDescription(result.ShortDescription)}</em></div>`;
         }
         
         card.innerHTML = html;
@@ -277,7 +277,7 @@ function displayError(message) {
     resultsContent.innerHTML = `
         <div class="result-card" style="border-left-color: #e74c3c;">
             <h3 class="result-title" style="color: #e74c3c;">Error</h3>
-            <div class="result-description">${message}</div>
+            <div class="result-description">${formatDescription(message)}</div>
         </div>
     `;
     
