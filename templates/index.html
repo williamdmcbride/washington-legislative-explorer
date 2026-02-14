@@ -60,6 +60,10 @@
                         <span class="tab-icon">⚖️</span>
                         RCW Citations
                     </button>
+                    <button class="tab-button" data-tab="wac">
+                        <span class="tab-icon">📜</span>
+                        WAC (Admin Code)
+                    </button>
                     <button class="tab-button" data-tab="committees">
                         <span class="tab-icon">👥</span>
                         Committees
@@ -102,6 +106,25 @@
                     </div>
                 </div>
 
+                <!-- WAC Tab -->
+                <div class="tab-content" data-tab-content="wac">
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="wac-search" 
+                            class="search-input" 
+                            placeholder="Enter WAC section or topic (e.g., 246-12-010, food safety)..."
+                        >
+                        <button id="search-wac-btn" class="search-button">
+                            Search
+                        </button>
+                    </div>
+                    <div class="search-help">
+                        <p><strong>Search Washington Administrative Code</strong></p>
+                        <p>Examples: 246-12-010 (food service), 296-17A (workers comp), environmental regulations</p>
+                    </div>
+                </div>
+
                 <!-- Committees Tab -->
                 <div class="tab-content" data-tab-content="committees">
                     <button id="load-committees-btn" class="search-button" style="width: 100%;">
@@ -134,6 +157,9 @@
         <div class="container">
             <p>Data provided by Washington State Legislature Web Services</p>
             <p class="disclaimer">This application is not affiliated with the Washington State Legislature</p>
+            <p style="margin-top: 1rem; font-style: italic; opacity: 0.8;">
+                Built for Joshua McBride by his younger, smarter, and taller brother William McBride
+            </p>
         </div>
     </footer>
 
