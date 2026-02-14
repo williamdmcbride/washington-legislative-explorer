@@ -85,6 +85,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Kittitas County Search Handler
+    const kittitasSearchBtn = document.getElementById('search-kittitas-btn');
+    const kittitasSearchInput = document.getElementById('kittitas-search');
+    
+    if (kittitasSearchBtn && kittitasSearchInput) {
+        kittitasSearchBtn.addEventListener('click', () => {
+            const searchTerm = kittitasSearchInput.value.trim();
+            if (!searchTerm) {
+                alert('Please enter a topic or code section');
+                return;
+            }
+            
+            searchKittitas(searchTerm);
+        });
+        
+        kittitasSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                kittitasSearchBtn.click();
+            }
+        });
+    }
+    
     // Committees Handler
     const committeesBtn = document.getElementById('load-committees-btn');
     
@@ -184,6 +206,33 @@ function searchWAC(searchTerm) {
     .catch(error => {
         hideLoading();
         displayError('Error searching WAC: ' + error.message);
+    });
+}
+
+function searchKittitas(searchTerm) {
+    showLoading();
+    
+    fetch('/api/search/kittitas', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            search_term: searchTerm
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            displayResults(data.data);
+        } else {
+            displayError(data.error);
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        displayError('Error searching Kittitas County: ' + error.message);
     });
 }
 
