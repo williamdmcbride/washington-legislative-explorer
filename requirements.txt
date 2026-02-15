@@ -1,5 +1,5 @@
-Flask
-python-dotenv
-zeep
-anthropic
-requests
+Flask==3.0.0
+python-dotenv==1.0.0
+zeep==4.2.1
+anthropic==0.39.0
+Werkzeug==3.0.1
