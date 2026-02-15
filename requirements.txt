@@ -3,3 +3,4 @@ python-dotenv
 zeep
 anthropic
 requests
+gunicorn
