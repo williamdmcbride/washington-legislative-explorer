@@ -16,6 +16,7 @@ import logging
 import json
 import re
 import time
+import requests
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -47,6 +48,63 @@ def call_claude_api_with_retry(client, prompt, max_tokens=1500, max_retries=3):
             else:
                 # Last attempt failed or non-overload error
                 raise api_error
+
+def call_perplexity_api(query, max_retries=3):
+    """Call Perplexity API for research queries"""
+    api_key = os.getenv('PERPLEXITY_API_KEY')
+    if not api_key:
+        raise Exception("PERPLEXITY_API_KEY not found")
+    
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            url = "https://api.perplexity.ai/chat/completions"
+            
+            payload = {
+                "model": "sonar",  # ✅ FIXED MODEL NAME
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": query
+                    }
+                ]
+            }
+            
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            logging.info(f"Calling Perplexity API with query: {query[:100]}...")
+            
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            
+            logging.info(f"Perplexity response status: {response.status_code}")
+            
+            if response.status_code != 200:
+                logging.error(f"Perplexity error response: {response.text}")
+            
+            response.raise_for_status()
+            
+            data = response.json()
+            return data['choices'][0]['message']['content']
+            
+        except requests.exceptions.HTTPError as http_err:
+            logging.error(f"Perplexity HTTP error: {http_err}")
+            logging.error(f"Response text: {response.text if 'response' in locals() else 'No response'}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                raise Exception(f"Perplexity API returned an error. Please check your API key and try again.")
+        except Exception as api_error:
+            logging.error(f"Perplexity API error: {api_error}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                raise Exception(f"Could not connect to Perplexity API: {str(api_error)}")
 
 def strip_all_html_from_text(text):
     """Nuclear option: Remove ALL HTML-like content from text"""
@@ -357,6 +415,46 @@ FORMATTING RULES:
             'error': f'Kittitas County search error: {error_msg}'
         }), 500
 
+@app.route('/api/search/research', methods=['POST'])
+def search_research():
+    """Research legislative topics using Perplexity AI"""
+    try:
+        data = request.json
+        search_term = data.get('search_term', '').strip()
+        
+        if not search_term:
+            return jsonify({
+                'success': False,
+                'error': 'Please enter a research query'
+            }), 400
+        
+        # Create focused research query
+        research_query = f"Research Washington State legislation and policy regarding: {search_term}. Include recent developments, key bills, and relevant policy context. Provide citations to official sources."
+
+        logging.info(f"Perplexity research query: {search_term}")
+        
+        research_result = call_perplexity_api(research_query)
+        
+        return jsonify({
+            'success': True,
+            'data': [{
+                'BillId': '🔍 Research & News',
+                'LongDescription': research_result,
+                'ShortDescription': f'Research findings for: "{search_term}"',
+                'PrimeSponsorName': 'Perplexity AI',
+                'CurrentStatus': {
+                    'BillStatus': 'Legislative Research'
+                }
+            }]
+        })
+        
+    except Exception as e:
+        logging.error(f"Research search error: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Research error: {str(e)}'
+        }), 500
+
 @app.route('/api/search/rcw', methods=['POST'])
 def search_rcw():
     """Search for bills affecting specific RCW sections"""
@@ -473,5 +571,8 @@ if __name__ == '__main__':
     if not os.getenv('ANTHROPIC_API_KEY'):
         logging.warning("WARNING: ANTHROPIC_API_KEY not found. AI-powered search will not work.")
         logging.warning("Add your API key to the .env file")
+    
+    if not os.getenv('PERPLEXITY_API_KEY'):
+        logging.warning("WARNING: PERPLEXITY_API_KEY not found. Research feature will not work.")
     
     app.run(debug=True, host='0.0.0.0', port=5001)
