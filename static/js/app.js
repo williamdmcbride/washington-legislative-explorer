@@ -107,6 +107,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Research & News Search Handler
+    const researchSearchBtn = document.getElementById('search-research-btn');
+    const researchSearchInput = document.getElementById('research-search');
+    
+    if (researchSearchBtn && researchSearchInput) {
+        researchSearchBtn.addEventListener('click', () => {
+            const searchTerm = researchSearchInput.value.trim();
+            if (!searchTerm) {
+                alert('Please enter a research query');
+                return;
+            }
+            
+            searchResearch(searchTerm);
+        });
+        
+        researchSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                researchSearchBtn.click();
+            }
+        });
+    }
+    
     // Committees Handler
     const committeesBtn = document.getElementById('load-committees-btn');
     
@@ -233,6 +255,33 @@ function searchKittitas(searchTerm) {
     .catch(error => {
         hideLoading();
         displayError('Error searching Kittitas County: ' + error.message);
+    });
+}
+
+function searchResearch(searchTerm) {
+    showLoading();
+    
+    fetch('/api/search/research', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            search_term: searchTerm
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            displayResults(data.data);
+        } else {
+            displayError(data.error);
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        displayError('Error performing research: ' + error.message);
     });
 }
 
