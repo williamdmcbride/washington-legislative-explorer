@@ -1,6 +1,6 @@
-Flask==3.0.0
-zeep==4.2.1
-Werkzeug==3.0.1
-anthropic
+Flask
 python-dotenv
-gunicorn==21.2.0
+zeep
+anthropic
+requests
+gunicorn
