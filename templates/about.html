@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Washington State Legislative Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="background-pattern"></div>
+
+    <div class="site-headers">
+        <header class="app-gradient-header" aria-label="App title">
+            <div class="app-gradient-header-inner">
+                <h2 class="app-gradient-title">Washington Legislative Explorer</h2>
+                <p class="app-gradient-subtitle">AI-powered legislative research</p>
+            </div>
+        </header>
+
+        <nav class="top-banner" aria-label="Primary navigation">
+            <div class="top-banner-inner">
+                <div class="top-banner-pills" role="tablist">
+                    <a class="tab-button tab-link" href="/">
+                        <span class="tab-icon">📋</span>
+                        Bills
+                    </a>
+                    <a class="tab-button tab-link" href="/">
+                        <span class="tab-icon">⚖️</span>
+                        RCW
+                    </a>
+                    <a class="tab-button tab-link" href="/">
+                        <span class="tab-icon">📜</span>
+                        WAC
+                    </a>
+                    <a class="tab-button tab-link" href="/">
+                        <span class="tab-icon">🏛️</span>
+                        County
+                    </a>
+                    <a class="tab-button tab-link" href="/">
+                        <span class="tab-icon">🔍</span>
+                        Research
+                    </a>
+                    <a class="tab-button tab-link" href="/">
+                        <span class="tab-icon">👥</span>
+                        Committees
+                    </a>
+                    <a class="tab-button tab-link active" href="/about" aria-current="page">
+                        <span class="tab-icon">ℹ️</span>
+                        About
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="app-layout">
+        <aside class="sidebar" aria-label="Sidebar">
+            <div class="sidebar-section sidebar-section-collapsible" id="construction-resources-section">
+                <button type="button" class="sidebar-heading-toggle" id="construction-resources-toggle" aria-expanded="false" aria-controls="construction-resources-content">
+                    <span class="sidebar-heading">Construction Resources</span>
+                    <span class="sidebar-chevron" id="construction-resources-chevron" aria-hidden="true">▶</span>
+                </button>
+                <div class="sidebar-collapsible-content" id="construction-resources-content">
+                    <div class="construction-resources-inner">
+                        <div class="construction-block">
+                            <button type="button" class="construction-sub-toggle" id="construction-quick-toggle" aria-expanded="false" aria-controls="construction-quick-submenu">
+                                <span>🏗️ Quick Searches</span>
+                                <span class="construction-sub-chevron" id="construction-quick-chevron" aria-hidden="true">▶</span>
+                            </button>
+                            <div class="construction-quick-submenu" id="construction-quick-submenu" hidden>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington residential building code WAC IRC">🏠 Residential Building</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington commercial building code WAC">🏢 Commercial Building</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington electrical code WAC">⚡ Electrical Codes</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington fire code building safety WAC">🔥 Fire Safety</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington HVAC mechanical code WAC 51-52">💨 HVAC &amp; Mechanical</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington plumbing code WAC">🚰 Plumbing</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington energy code WAC 51-54">🔋 Energy Codes</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington building permit requirements">📋 Permit Requirements</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington contractor licensing RCW 18.27">👷 Contractor Licensing</button>
+                            </div>
+                        </div>
+                        <button type="button" class="sidebar-item-button" id="construction-code-ref-btn">📚 Code Reference</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-spacer" aria-hidden="true"></div>
+
+            <div class="sidebar-section sidebar-section--bottom">
+                <h2 class="sidebar-heading">Settings</h2>
+                <p class="sidebar-settings-note">More options in a future update.</p>
+            </div>
+        </aside>
+
+        <div class="layout-main">
+            <main class="main-content">
+                <section class="about-page">
+                    <div class="about-container">
+                        <h1 class="about-title">About WA Legislative Explorer</h1>
+
+                        <section class="about-card">
+                            <h2>Data Sources</h2>
+                            <ul>
+                                <li><strong>Live API Data (Real-time from WA State Legislature):</strong></li>
+                                <li>✅ Bills - Washington State SOAP API (LegislationService)</li>
+                                <li>✅ RCW Citations - Washington State SOAP API (RcwCiteAffectedService)</li>
+                                <li>✅ Committees - Washington State SOAP API (CommitteeService)</li>
+                                <li><strong>Web Research (Perplexity AI):</strong></li>
+                                <li>🔍 WAC (Washington Administrative Code) - No official API exists</li>
+                                <li>🔍 County Codes - No official APIs exist</li>
+                                <li>🔍 Research &amp; News - Real-time web search</li>
+                            </ul>
+                        </section>
+
+                        <button type="button" class="about-dropdown-toggle" id="api-reference-toggle" aria-expanded="false" aria-controls="api-reference-content">
+                            <span class="about-dropdown-title">Available Washington State APIs</span>
+                            <span class="about-dropdown-chevron" id="api-reference-chevron" aria-hidden="true">▶</span>
+                        </button>
+
+                        <div class="about-dropdown-content" id="api-reference-content" hidden>
+                            <p>Washington State Legislature provides several SOAP-based web services for accessing legislative information. Below is a complete list of available APIs and how this tool uses them.</p>
+
+                            <div class="api-list">
+                                <div class="api-item">
+                                    <h4>LegislationService <span class="about-badge about-badge--active">✅ In Use</span></h4>
+                                    <p>Provides information about bills, amendments, sponsors, and bill status. Includes search capabilities and detailed bill information.</p>
+                                </div>
+
+                                <div class="api-item">
+                                    <h4>RcwCiteAffectedService <span class="about-badge about-badge--active">✅ In Use</span></h4>
+                                    <p>Returns legislation that affects specific RCW (Revised Code of Washington) citations. Shows which bills modify or reference particular laws.</p>
+                                </div>
+
+                                <div class="api-item">
+                                    <h4>CommitteeService <span class="about-badge about-badge--active">✅ In Use</span></h4>
+                                    <p>Provides committee information including names, members, meeting schedules, and committee assignments.</p>
+                                </div>
+
+                                <div class="api-item">
+                                    <h4>SessionLawService <span class="about-badge about-badge--inactive">○ Not Used</span></h4>
+                                    <p>Provides access to session laws - bills that have been enacted into law during a legislative session.</p>
+                                </div>
+
+                                <div class="api-item">
+                                    <h4>SponsorService <span class="about-badge about-badge--inactive">○ Not Used</span></h4>
+                                    <p>Detailed information about bill sponsors, including legislator profiles and sponsorship history.</p>
+                                </div>
+
+                                <div class="api-item">
+                                    <h4>LegislativeDocumentService <span class="about-badge about-badge--inactive">○ Not Used</span></h4>
+                                    <p>Access to legislative documents including bill drafts, amendments, fiscal notes, and other official documents.</p>
+                                </div>
+
+                                <div class="api-item">
+                                    <h4>CommitteeActionService <span class="about-badge about-badge--inactive">○ Not Used</span></h4>
+                                    <p>Tracks committee actions on bills including hearings, votes, and recommendations.</p>
+                                </div>
+                            </div>
+
+                            <p class="api-note"><strong>Note:</strong> There are NO official APIs available for RCW text, WAC (Washington Administrative Code) text, or County Codes. For these, we use Perplexity AI to search the web and cite official sources.</p>
+                        </div>
+
+                        <section class="about-card">
+                            <h2>How It Works</h2>
+                            <ul>
+                                <li>Live API tabs connect directly to official WA State Legislature databases.</li>
+                                <li>Web Research tabs use Perplexity to search the internet and cite sources.</li>
+                                <li>All web research results include clickable source links.</li>
+                            </ul>
+                        </section>
+
+                        <section class="about-card">
+                            <h2>What This Means</h2>
+                            <ul>
+                                <li>Bills, RCW, and Committees data is official and real-time.</li>
+                                <li>WAC and County Code information comes from web searches with source citations.</li>
+                                <li>Always verify critical information with official sources.</li>
+                            </ul>
+                        </section>
+
+                        <section class="about-card">
+                            <h2>Limitations &amp; Disclaimers</h2>
+                            <ul>
+                                <li>Live API data is official but may have delays during updates.</li>
+                                <li>Web research is accurate but should be verified for legal/compliance decisions.</li>
+                                <li>For official WAC codes, visit: <a href="https://apps.leg.wa.gov/wac" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac</a></li>
+                                <li>For official county codes, visit your county's website.</li>
+                                <li>This tool is for research purposes, not legal advice.</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="code-ref-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="code-ref-title" hidden>
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="code-ref-title">Code Reference</h3>
+                <button type="button" class="modal-close" id="code-ref-close" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-lead">Common Washington construction-related citations (for orientation—verify against current official sources):</p>
+                <ul class="modal-ref-list">
+                    <li><strong>WAC 51-50:</strong> International Building Code (state amendments)</li>
+                    <li><strong>WAC 51-51:</strong> International Residential Code (state amendments)</li>
+                    <li><strong>WAC 51-52:</strong> Washington State Mechanical Code</li>
+                    <li><strong>WAC 51-54:</strong> Washington State Energy Code</li>
+                    <li><strong>WAC 51-56:</strong> Uniform Plumbing Code (state amendments)</li>
+                    <li><strong>RCW 18.27:</strong> Contractor registration</li>
+                    <li><strong>RCW Chapter 51:</strong> Industrial insurance / workplace safety (L&amp;I)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Data provided by Washington State Legislature Web Services</p>
+        <p class="disclaimer">This application is not affiliated with the Washington State Legislature</p>
+        <p class="footer-credit">Built for Joshua McBride by his younger, smarter, and taller brother William McBride</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const apiToggle = document.getElementById('api-reference-toggle');
+        const apiContent = document.getElementById('api-reference-content');
+        const apiChevron = document.getElementById('api-reference-chevron');
+
+        if (apiToggle && apiContent) {
+            apiToggle.addEventListener('click', () => {
+                const isExpanded = apiToggle.getAttribute('aria-expanded') === 'true';
+
+                if (isExpanded) {
+                    apiContent.setAttribute('hidden', '');
+                    apiToggle.setAttribute('aria-expanded', 'false');
+                    if (apiChevron) apiChevron.textContent = '▶';
+                } else {
+                    apiContent.removeAttribute('hidden');
+                    apiToggle.setAttribute('aria-expanded', 'true');
+                    if (apiChevron) apiChevron.textContent = '▼';
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

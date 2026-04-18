@@ -3,164 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Washington State Code Explorer</title>
+    <title>Washington State Legislative Explorer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="background-pattern"></div>
-    
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="state-seal">
-                        <svg viewBox="0 0 100 100" class="seal-svg">
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2"/>
-                            <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1"/>
-                            <text x="50" y="45" text-anchor="middle" font-size="14" fill="currentColor" font-family="serif">WA</text>
-                            <text x="50" y="60" text-anchor="middle" font-size="8" fill="currentColor" font-family="serif">1889</text>
-                        </svg>
-                    </div>
-                    <div class="title-block">
-                        <h1 class="main-title">Washington State Legislative Code</h1>
-                        <p class="subtitle">Real-time access to state legislation</p>
-                    </div>
-                </div>
+
+    <div class="site-headers">
+        <header class="app-gradient-header" aria-label="App title">
+            <div class="app-gradient-header-inner">
+                <h2 class="app-gradient-title">Washington Legislative Explorer</h2>
+                <p class="app-gradient-subtitle">AI-powered legislative research</p>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <main class="main-content">
-        <div class="container">
-            
-            <!-- Search Section -->
-            <section class="search-section">
-                <div class="search-header">
-                    <h2>Search Legislation</h2>
-                    <div class="biennium-selector">
-                        <label for="biennium">Session:</label>
-                        <select id="biennium" class="biennium-select">
-                            <option value="2023-24">2023-24</option>
-                            <option value="2021-22">2021-22</option>
-                            <option value="2019-20">2019-20</option>
-                            <option value="2017-18">2017-18</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="search-tabs">
-                    <button class="tab-button active" data-tab="bills">
+        <nav class="top-banner" aria-label="Primary navigation">
+            <div class="top-banner-inner">
+                <div class="top-banner-pills" role="tablist">
+                    <button type="button" class="tab-button active" data-tab="bills" role="tab" aria-selected="true">
                         <span class="tab-icon">📋</span>
-                        Bills & Legislation
+                        Bills<span class="tab-badge tab-badge--live">✅ API</span>
                     </button>
-                    <button class="tab-button" data-tab="rcw">
+                    <button type="button" class="tab-button" data-tab="rcw" role="tab" aria-selected="false">
                         <span class="tab-icon">⚖️</span>
-                        RCW Citations
+                        RCW<span class="tab-badge tab-badge--web">🔍 Web</span> <span class="tab-badge tab-badge--live">✅ API</span>
                     </button>
-                    <button class="tab-button" data-tab="wac">
+                    <button type="button" class="tab-button" data-tab="wac" role="tab" aria-selected="false">
                         <span class="tab-icon">📜</span>
-                        WAC (Admin Code)
+                        WAC<span class="tab-badge tab-badge--web">🔍 Web</span>
                     </button>
-                    <button class="tab-button" data-tab="committees">
+                    <button type="button" class="tab-button" data-tab="county" role="tab" aria-selected="false">
+                        <span class="tab-icon">🏛️</span>
+                        County<span class="tab-badge tab-badge--web">🔍 Web</span>
+                    </button>
+                    <button type="button" class="tab-button" data-tab="research" role="tab" aria-selected="false">
+                        <span class="tab-icon">🔍</span>
+                        Research<span class="tab-badge tab-badge--web">🔍 Web</span>
+                    </button>
+                    <button type="button" class="tab-button" data-tab="committees" role="tab" aria-selected="false">
                         <span class="tab-icon">👥</span>
-                        Committees
+                        Committees<span class="tab-badge tab-badge--live">✅ API</span>
                     </button>
+                    <a class="tab-button tab-link" href="/about" aria-label="About WA Legislative Explorer">
+                        <span class="tab-icon">ℹ️</span>
+                        About
+                    </a>
                 </div>
+            </div>
+        </nav>
+    </div>
 
-                <!-- Bills Tab -->
-                <div class="tab-content active" data-tab-content="bills">
-                    <div class="search-box">
-                        <input 
-                            type="text" 
-                            id="bill-search" 
-                            class="search-input" 
-                            placeholder="Enter bill number (e.g., HB 1001, SB 5050)..."
-                        >
-                        <button id="search-bills-btn" class="search-button">
-                            Search
-                        </button>
-                    </div>
-                    <div class="search-help">
-                        <p><strong>Examples:</strong> HB 1001, SB 5050, HJR 4200</p>
-                    </div>
-                </div>
-
-                <!-- RCW Tab -->
-                <div class="tab-content" data-tab-content="rcw">
-                    <div class="search-box">
-                        <input 
-                            type="text" 
-                            id="rcw-search" 
-                            class="search-input" 
-                            placeholder="Enter RCW section (e.g., 9.41.010)..."
-                        >
-                        <button id="search-rcw-btn" class="search-button">
-                            Search
-                        </button>
-                    </div>
-                    <div class="search-help">
-                        <p><strong>Find bills that affect specific RCW sections</strong></p>
-                    </div>
-                </div>
-
-                <!-- WAC Tab -->
-                <div class="tab-content" data-tab-content="wac">
-                    <div class="search-box">
-                        <input 
-                            type="text" 
-                            id="wac-search" 
-                            class="search-input" 
-                            placeholder="Enter WAC section or topic (e.g., 246-12-010, food safety)..."
-                        >
-                        <button id="search-wac-btn" class="search-button">
-                            Search
-                        </button>
-                    </div>
-                    <div class="search-help">
-                        <p><strong>Search Washington Administrative Code</strong></p>
-                        <p>Examples: 246-12-010 (food service), 296-17A (workers comp), environmental regulations</p>
+    <div class="app-layout">
+        <aside class="sidebar" aria-label="Sidebar">
+            <div class="sidebar-section sidebar-section-collapsible" id="construction-resources-section">
+                <button type="button" class="sidebar-heading-toggle" id="construction-resources-toggle" aria-expanded="false" aria-controls="construction-resources-content">
+                    <span class="sidebar-heading">Construction Resources</span>
+                    <span class="sidebar-chevron" id="construction-resources-chevron" aria-hidden="true">▶</span>
+                </button>
+                <div class="sidebar-collapsible-content" id="construction-resources-content">
+                    <div class="construction-resources-inner">
+                        <div class="construction-block">
+                            <button type="button" class="construction-sub-toggle" id="construction-quick-toggle" aria-expanded="false" aria-controls="construction-quick-submenu">
+                                <span>🏗️ Quick Searches</span>
+                                <span class="construction-sub-chevron" id="construction-quick-chevron" aria-hidden="true">▶</span>
+                            </button>
+                            <div class="construction-quick-submenu" id="construction-quick-submenu" hidden>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington residential building code WAC IRC">🏠 Residential Building</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington commercial building code WAC">🏢 Commercial Building</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington electrical code WAC">⚡ Electrical Codes</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington fire code building safety WAC">🔥 Fire Safety</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington HVAC mechanical code WAC 51-52">💨 HVAC &amp; Mechanical</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington plumbing code WAC">🚰 Plumbing</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington energy code WAC 51-54">🔋 Energy Codes</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington building permit requirements">📋 Permit Requirements</button>
+                                <button type="button" class="sidebar-item-button construction-wac-quick" data-wac-term="Washington contractor licensing RCW 18.27">👷 Contractor Licensing</button>
+                            </div>
+                        </div>
+                        <button type="button" class="sidebar-item-button" id="construction-code-ref-btn">📚 Code Reference</button>
                     </div>
                 </div>
-
-                <!-- Committees Tab -->
-                <div class="tab-content" data-tab-content="committees">
-                    <button id="load-committees-btn" class="search-button" style="width: 100%;">
-                        Load All Committees
-                    </button>
-                </div>
-            </section>
-
-            <!-- Results Section -->
-            <section class="results-section" id="results-container" style="display: none;">
-                <div class="results-header">
-                    <h3>Results</h3>
-                    <button id="clear-results" class="clear-button">Clear</button>
-                </div>
-                <div id="results-content" class="results-content">
-                    <!-- Results will be inserted here -->
-                </div>
-            </section>
-
-            <!-- Loading Indicator -->
-            <div id="loading" class="loading-indicator" style="display: none;">
-                <div class="spinner"></div>
-                <p>Searching legislative database...</p>
             </div>
 
+            <div class="sidebar-spacer" aria-hidden="true"></div>
+
+            <div class="sidebar-section sidebar-section--bottom">
+                <h2 class="sidebar-heading">Settings</h2>
+                <p class="sidebar-settings-note">More options in a future update.</p>
+            </div>
+        </aside>
+
+        <div class="layout-main">
+            <main class="main-content">
+                    <section class="search-section">
+                        <div class="search-header">
+                            <h2>Search Legislation</h2>
+                            <div class="biennium-selector">
+                                <label for="biennium">Session:</label>
+                                <select id="biennium" class="biennium-select">
+                                    <option value="2023-24">2023-24</option>
+                                    <option value="2021-22">2021-22</option>
+                                    <option value="2019-20">2019-20</option>
+                                    <option value="2017-18">2017-18</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="main-panel active" data-tab-content="bills" role="tabpanel">
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="bill-search"
+                                    class="search-input"
+                                    placeholder="Search by bill number or ask a question (e.g., HB 1001, education funding, climate policy)"
+                                >
+                                <button id="search-bills-btn" class="search-button">
+                                    Search
+                                </button>
+                            </div>
+                            <div class="search-help">
+                                <p><strong>Search by bill number or natural language:</strong> HB 1001, SB 5050, HJR 4200, education funding, climate policy</p>
+                            </div>
+                        </div>
+
+                        <div class="main-panel" data-tab-content="rcw" role="tabpanel">
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="rcw-search"
+                                    class="search-input"
+                                    placeholder="Search by RCW section or ask a question (e.g., 9.41.010, firearm possession laws, tenant rights)"
+                                >
+                                <button id="search-rcw-btn" class="search-button">
+                                    Search
+                                </button>
+                            </div>
+                            <div class="search-help">
+                                <p><strong>Search by RCW citation or natural language:</strong> RCW 9.41.010, RCW 59.18, firearm possession laws, tenant rights</p>
+                            </div>
+                        </div>
+
+                        <div class="main-panel" data-tab-content="wac" role="tabpanel">
+                            <p class="wac-disclaimer">
+                                Searches use web research. For official codes, visit
+                                <a href="https://apps.leg.wa.gov/wac" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac</a>
+                            </p>
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="wac-search"
+                                    class="search-input"
+                                    placeholder="Search by WAC section or ask a question (e.g., 246-12-010, food safety rules, workplace safety requirements)"
+                                >
+                                <button id="search-wac-btn" class="search-button">
+                                    Search
+                                </button>
+                            </div>
+                            <div class="search-help">
+                                <p><strong>Search Washington Administrative Code by citation or natural language</strong></p>
+                                <p>Examples: WAC 246-12-010, WAC 296-17A, food safety rules, environmental regulations</p>
+                            </div>
+                        </div>
+
+                        <div class="main-panel" data-tab-content="county" role="tabpanel">
+                            <p class="county-disclaimer">
+                                Searches use web research. For official codes, visit your county website
+                            </p>
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="county-search"
+                                    class="search-input"
+                                    placeholder="Ask in plain language (e.g., King County building permits, Pierce County zoning, KCC 17.15)"
+                                >
+                                <button id="search-county-btn" class="search-button">
+                                    Search
+                                </button>
+                            </div>
+                            <div class="search-help">
+                                <p><strong>County codes:</strong> describe what you need and name the county if it matters—results use web research (not a live county database).</p>
+                                <p>Examples: King County building permits, Spokane County flood rules, KCC 14.04 Kittitas</p>
+                            </div>
+                        </div>
+
+                        <div class="main-panel" data-tab-content="research" role="tabpanel">
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="research-search"
+                                    class="search-input"
+                                    placeholder="Search by bill number/topic or ask a question (e.g., HB 1001, recent housing bills, what changed in police reform?)"
+                                >
+                                <button id="search-research-btn" class="search-button">
+                                    Research
+                                </button>
+                            </div>
+                            <div class="search-help">
+                                <p><strong>Research with bill numbers or natural-language questions and get citations</strong></p>
+                                <p>Examples: HB 1001, recent education bills, police reform legislation, what changed in housing policy?</p>
+                            </div>
+                        </div>
+
+                        <div class="main-panel" data-tab-content="committees" role="tabpanel">
+                            <button id="load-committees-btn" class="search-button" style="width: 100%;">
+                                Load All Committees
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="results-section" id="results-container" style="display: none;">
+                        <div class="results-header">
+                            <h3>Results</h3>
+                            <button id="clear-results" class="clear-button">Clear</button>
+                        </div>
+                        <div id="results-source-badge"></div>
+                        <div id="results-content" class="results-content">
+                            <!-- Results will be inserted here -->
+                        </div>
+                    </section>
+
+                    <div id="loading" class="loading-indicator" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Searching legislative database...</p>
+                    </div>
+            </main>
         </div>
-    </main>
+    </div>
+
+    <div id="code-ref-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="code-ref-title" hidden>
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="code-ref-title">Code Reference</h3>
+                <button type="button" class="modal-close" id="code-ref-close" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-lead">Common Washington construction-related citations (for orientation—verify against current official sources):</p>
+                <ul class="modal-ref-list">
+                    <li><strong>WAC 51-50:</strong> International Building Code (state amendments)</li>
+                    <li><strong>WAC 51-51:</strong> International Residential Code (state amendments)</li>
+                    <li><strong>WAC 51-52:</strong> Washington State Mechanical Code</li>
+                    <li><strong>WAC 51-54:</strong> Washington State Energy Code</li>
+                    <li><strong>WAC 51-56:</strong> Uniform Plumbing Code (state amendments)</li>
+                    <li><strong>RCW 18.27:</strong> Contractor registration</li>
+                    <li><strong>RCW Chapter 51:</strong> Industrial insurance / workplace safety (L&amp;I)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
-        <div class="container">
-            <p>Data provided by Washington State Legislature Web Services</p>
-            <p class="disclaimer">This application is not affiliated with the Washington State Legislature</p>
-            <p style="margin-top: 1rem; font-style: italic; opacity: 0.8;">
-                Built for Joshua McBride by his younger, smarter, and taller brother William McBride
-            </p>
-        </div>
+        <p>Data provided by Washington State Legislature Web Services</p>
+        <p class="disclaimer">This application is not affiliated with the Washington State Legislature</p>
+        <p class="footer-credit">Built for Joshua McBride by his younger, smarter, and taller brother William McBride</p>
     </footer>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
