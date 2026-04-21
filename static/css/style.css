@@ -194,13 +194,10 @@ body > .footer {
 
 .top-banner-pills {
     display: flex;
-    flex-wrap: nowrap;
+    gap: 0.5rem;
     align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+    flex-wrap: wrap;
+    overflow-x: visible;
 }
 
 /* ===== SIDEBAR ===== */
@@ -560,6 +557,7 @@ body > .footer {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    flex-shrink: 0;
     white-space: nowrap;
 }
 
@@ -589,11 +587,11 @@ body > .footer {
 
 .tab-badge {
     display: inline-block;
-    padding: 2px 6px;
+    padding: 2px 4px;
     border-radius: 9999px;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
-    margin-left: 4px;
+    margin-left: 3px;
     white-space: nowrap;
 }
 
