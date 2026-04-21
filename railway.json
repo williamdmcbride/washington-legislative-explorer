@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "python process_fire_code.py && gunicorn --bind 0.0.0.0:$PORT app:app",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
