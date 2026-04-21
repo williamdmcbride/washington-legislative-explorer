@@ -215,6 +215,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    const firecodeSearchBtn = document.getElementById('search-firecode-btn');
+    const firecodeSearchInput = document.getElementById('firecode-search');
+
+    if (firecodeSearchBtn && firecodeSearchInput) {
+        firecodeSearchBtn.addEventListener('click', () => {
+            const searchTerm = firecodeSearchInput.value.trim();
+            if (!searchTerm) {
+                alert('Please enter a fire code question');
+                return;
+            }
+
+            searchFireCode(searchTerm);
+        });
+
+        firecodeSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                firecodeSearchBtn.click();
+            }
+        });
+    }
     
     // Research & News Search Handler
     const researchSearchBtn = document.getElementById('search-research-btn');
@@ -364,6 +385,33 @@ function searchCountyCodes(searchTerm) {
     .catch(error => {
         hideLoading();
         displayError('Error searching county codes: ' + error.message);
+    });
+}
+
+function searchFireCode(searchTerm) {
+    showLoading();
+
+    fetch('/api/search/fire-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            search_term: searchTerm
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            displayResults(data.data);
+        } else {
+            displayError(data.error);
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        displayError('Error searching Fire Code: ' + error.message);
     });
 }
 
@@ -567,14 +615,27 @@ function buildCitationListHtml(citations) {
     const items = [];
     citations.forEach(c => {
         const url = (c && c.url) ? String(c.url).trim() : '';
-        if (!/^https?:\/\//i.test(url)) {
+        const title = ((c && c.title) ? String(c.title).trim() : '') || url;
+
+        // Handle Fire Code page references
+        if (url && url.startsWith('#page-')) {
+            const pageNum = url.replace('#page-', '');
+            items.push(
+                `<li>WAC 51-54A Page ${escapeHtml(pageNum)}</li>`
+            );
             return;
         }
-        const title = ((c && c.title) ? String(c.title).trim() : '') || url;
-        const href = escapeHtml(url);
-        items.push(
-            `<li><a class="citation-link result-external-link" href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}${externalLinkMarkerHtml()}</a></li>`
-        );
+
+        if (/^https?:\/\//i.test(url)) {
+            const href = escapeHtml(url);
+            items.push(
+                `<li><a class="citation-link result-external-link" href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}${externalLinkMarkerHtml()}</a></li>`
+            );
+        } else if (title) {
+            items.push(
+                `<li><span class="citation-inline">${escapeHtml(title)}</span></li>`
+            );
+        }
     });
     if (!items.length) {
         return '';
@@ -599,6 +660,10 @@ function getTopSourceBadgeHtml(results) {
     if (first && first.ResearchType === 'rcw_combined') {
         return `<div style="margin-bottom: 1rem;">${webBadge} ${liveBadge}</div>`;
     }
+    if (activeSearchTab === 'firecode') {
+        const ragBadge = '<span style="background: #8b5cf6; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block;">🔍 RAG</span>';
+        return `<div style="margin-bottom: 1rem;">${ragBadge}</div>`;
+    }
     if (activeSearchTab === 'wac' || activeSearchTab === 'county' || activeSearchTab === 'research') {
         return `<div style="margin-bottom: 1rem;">${webBadge}</div>`;
     }
@@ -620,6 +685,8 @@ function getSourceBadgesHtml(result, opts = {}) {
 
     if (isCommittee) {
         badges.push('<span class="result-badge result-badge--live">✅ Live API Data</span>');
+    } else if (result.ResearchType === 'fire_code_rag') {
+        badges.push('<span class="result-badge result-badge--web">🔍 RAG</span>');
     } else if (isWebResearch) {
         badges.push('<span class="result-badge result-badge--web">🔍 Web Research</span>');
     } else if (isResearchNews) {
@@ -710,6 +777,7 @@ function displayResults(results) {
 
         const isWebResearch = result.ResearchType === 'wac_web_research'
             || result.ResearchType === 'county_web_research';
+        const isFireCodeRag = result.ResearchType === 'fire_code_rag';
         const titleRaw = resolveResultTitle(result);
         const committee = isCommitteeCard(result);
         let html = '';
@@ -733,6 +801,26 @@ function displayResults(results) {
             if (result.LongName) {
                 html += `<div class="result-description">${formatDescription(result.LongName, linkContext)}</div>`;
             }
+            card.innerHTML = html;
+            resultsContent.appendChild(card);
+            return;
+        }
+
+        if (isFireCodeRag) {
+            html += `
+                <div class="result-title-row">
+                    <h3 class="result-title">${escapeHtml(String(titleRaw))}</h3>
+                    ${getSourceBadgesHtml(result)}
+                </div>
+            `;
+            if (result.DataSourceNote) {
+                html += `<p class="data-source-note">${escapeHtml(result.DataSourceNote)}</p>`;
+            }
+            const fcBody = result.LongDescription || result.Summary || result.Text;
+            if (fcBody) {
+                html += `<div class="result-description">${formatDescription(fcBody, linkContext)}</div>`;
+            }
+            html += buildCitationListHtml(result.Citations);
             card.innerHTML = html;
             resultsContent.appendChild(card);
             return;

@@ -18,9 +18,31 @@ import json
 import re
 import time
 import requests
+import chromadb
+from chromadb.utils import embedding_functions
+from anthropic import Anthropic
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
+
+# Initialize Chroma client for Fire Code
+CHROMA_PATH = "data/chroma_fire_code"
+chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
+embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name="all-MiniLM-L6-v2"
+)
+
+try:
+    fire_code_collection = chroma_client.get_collection(
+        name="fire_code",
+        embedding_function=embedding_fn
+    )
+    print(f"✅ Loaded Fire Code database: {fire_code_collection.count()} chunks")
+except Exception as e:
+    print(f"⚠️  Fire Code database not found: {e}")
+    fire_code_collection = None
+
+anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY")) if os.getenv("ANTHROPIC_API_KEY") else None
 
 # WA State Legislative Web Services URLs
 LEGISLATION_SERVICE = "https://wslwebservices.leg.wa.gov/LegislationService.asmx?WSDL"
@@ -176,6 +198,103 @@ Provide helpful guidance in the following format:
 Be specific, actionable, and concise. Format your response in clear sections."""
 
     return call_claude_api_with_retry(client, prompt, max_tokens=1500)
+
+
+def search_fire_code(query, n_results=3):
+    """Search Fire Code using RAG"""
+    if not fire_code_collection:
+        return {
+            'success': False,
+            'error': 'Fire Code database not initialized. Run process_fire_code.py first.'
+        }
+
+    if not anthropic_client:
+        return {
+            'success': False,
+            'error': 'Anthropic API not configured. Set ANTHROPIC_API_KEY.'
+        }
+
+    try:
+        # Search vector database
+        results = fire_code_collection.query(
+            query_texts=[query],
+            n_results=n_results
+        )
+
+        # Extract relevant chunks
+        chunks = []
+        if results['documents'] and results['documents'][0]:
+            for i, doc in enumerate(results['documents'][0]):
+                metadata = {}
+                metas = results.get('metadatas')
+                if metas and metas[0] and i < len(metas[0]):
+                    metadata = metas[0][i] or {}
+                if not isinstance(metadata, dict):
+                    metadata = {}
+                chunks.append({
+                    'text': doc,
+                    'page': metadata.get('page', 'Unknown'),
+                    'source': metadata.get('source', 'WAC 51-54A')
+                })
+
+        if not chunks:
+            return {
+                'success': False,
+                'error': 'No relevant sections found in Fire Code.'
+            }
+
+        # Limit each chunk to ~500 chars to avoid rate limits
+        context = "\n\n---\n\n".join([
+            f"[Page {c['page']}]\n{c['text'][:500]}..." for c in chunks
+        ])
+
+        # Create Claude prompt
+        prompt = f"""You are a helpful assistant for the Washington State Fire Code (WAC 51-54A).
+
+Based on the following sections from the Fire Code, answer the user's question. Always cite the specific page numbers in your response.
+
+FIRE CODE SECTIONS:
+{context}
+
+USER QUESTION: {query}
+
+Provide a clear, accurate answer based on the Fire Code sections above. Always cite page numbers like this: (Page 5) or (Pages 5-7). If the sections don't fully answer the question, say so."""
+
+        # Call Claude API
+        message = anthropic_client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=2000,
+            messages=[{
+                "role": "user",
+                "content": prompt
+            }]
+        )
+
+        answer = message.content[0].text
+
+        # Format response
+        return {
+            'success': True,
+            'data': {
+                'BillId': '🔥 Fire Code Search',
+                'ResearchType': 'fire_code_rag',
+                'LongDescription': answer,
+                'Citations': [
+                    {
+                        'title': f"WAC 51-54A Page {c['page']}",
+                        'url': f"#page-{c['page']}"
+                    } for c in chunks
+                ],
+                'DataSourceNote': f'Retrieved from {len(chunks)} relevant sections of WAC 51-54A (Washington State Fire Code)'
+            }
+        }
+
+    except Exception as e:
+        return {
+            'success': False,
+            'error': f'Error searching Fire Code: {str(e)}'
+        }
+
 
 @app.route('/')
 def index():
@@ -500,6 +619,30 @@ def search_rcw():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@app.route('/api/search/fire-code', methods=['POST'])
+def api_search_fire_code():
+    """Fire Code RAG search endpoint"""
+    try:
+        data = request.get_json()
+        query = data.get('search_term', '').strip()
+
+        if not query:
+            return jsonify({
+                'success': False,
+                'error': 'Please enter a search query'
+            })
+
+        result = search_fire_code(query)
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
 
 @app.route('/api/committees')
 def get_committees():

@@ -1107,6 +1107,18 @@ body > .footer {
     line-height: 1.5;
 }
 
+.about-how-lead {
+    margin: 0 0 0.5rem;
+}
+
+.about-how-steps {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
 .about-dropdown-toggle {
     width: 100%;
     display: flex;

@@ -109,6 +109,11 @@
                                 <li>🔍 WAC (Washington Administrative Code) - No official API exists</li>
                                 <li>🔍 County Codes - No official APIs exist</li>
                                 <li>🔍 Research &amp; News - Real-time web search</li>
+                                <li><strong>RAG-Powered Search (Fire Code):</strong></li>
+                                <li>🔥 Fire Code - Retrieval-Augmented Generation using local vector database</li>
+                                <li>Searches 82 sections of WAC 51-54A (Washington State Fire Code)</li>
+                                <li>Provides answers with specific page citations</li>
+                                <li>Combines semantic search with Claude AI</li>
                             </ul>
                         </section>
 
@@ -158,6 +163,8 @@
                             </div>
 
                             <p class="api-note"><strong>Note:</strong> There are NO official APIs available for RCW text, WAC (Washington Administrative Code) text, or County Codes. For these, we use Perplexity AI to search the web and cite official sources.</p>
+
+                            <p class="api-note"><strong>Fire Code:</strong> Uses RAG (Retrieval-Augmented Generation) with a local vector database created from the official WAC 51-54A PDF. This is not an API but provides fast, accurate searches with page-level citations.</p>
                         </div>
 
                         <section class="about-card">
@@ -166,6 +173,15 @@
                                 <li>Live API tabs connect directly to official WA State Legislature databases.</li>
                                 <li>Web Research tabs use Perplexity to search the internet and cite sources.</li>
                                 <li>All web research results include clickable source links.</li>
+                                <li>
+                                    <p class="about-how-lead"><strong>Fire Code RAG:</strong> The Fire Code tab uses Retrieval-Augmented Generation (RAG) technology. The complete WAC 51-54A Fire Code PDF has been processed into a searchable vector database. When you ask a question, the system:</p>
+                                    <ol class="about-how-steps">
+                                        <li>Searches the database for relevant Fire Code sections</li>
+                                        <li>Retrieves the top 3 most relevant passages</li>
+                                        <li>Sends those specific sections to Claude AI</li>
+                                        <li>Claude generates an answer citing exact page numbers</li>
+                                    </ol>
+                                </li>
                             </ul>
                         </section>
 
@@ -186,6 +202,11 @@
                                 <li>For official WAC codes, visit: <a href="https://apps.leg.wa.gov/wac" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac</a></li>
                                 <li>For official county codes, visit your county's website.</li>
                                 <li>This tool is for research purposes, not legal advice.</li>
+                                <li><strong>Fire Code RAG Limitations:</strong></li>
+                                <li>Based on the 2021 edition of WAC 51-54A (may not reflect newer amendments)</li>
+                                <li>Searches semantic meaning, not exact keyword matching</li>
+                                <li>Always verify critical fire safety requirements with official sources</li>
+                                <li>For official Fire Code: <a href="https://apps.leg.wa.gov/wac/default.aspx?cite=51-54" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac/default.aspx?cite=51-54</a></li>
                             </ul>
                         </section>
 

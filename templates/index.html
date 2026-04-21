@@ -36,6 +36,11 @@
                         <span class="tab-icon">🏛️</span>
                         County<span class="tab-badge tab-badge--web">🔍 Web</span>
                     </button>
+                    <button type="button" class="tab-button" data-tab="firecode" role="tab" aria-selected="false">
+                        <span class="tab-icon">🔥</span>
+                        Fire Code
+                        <span class="tab-badge tab-badge--web">🔍 RAG</span>
+                    </button>
                     <button type="button" class="tab-button" data-tab="research" role="tab" aria-selected="false">
                         <span class="tab-icon">🔍</span>
                         Research<span class="tab-badge tab-badge--web">🔍 Web</span>
@@ -182,6 +187,25 @@
                             <div class="search-help">
                                 <p><strong>County codes:</strong> describe what you need and name the county if it matters—results use web research (not a live county database).</p>
                                 <p>Examples: King County building permits, Spokane County flood rules, KCC 14.04 Kittitas</p>
+                            </div>
+                        </div>
+
+                        <div class="main-panel" data-tab-content="firecode" role="tabpanel">
+                            <h2 class="firecode-panel-title">Search Fire Code</h2>
+                            <div class="search-box">
+                                <input
+                                    type="text"
+                                    id="firecode-search"
+                                    class="search-input"
+                                    placeholder="Ask questions about WA State Fire Code (e.g., sprinkler requirements, exit signs, fire alarm systems)"
+                                >
+                                <button id="search-firecode-btn" class="search-button">
+                                    Search
+                                </button>
+                            </div>
+                            <div class="search-help">
+                                <p><strong>Search the Washington State Fire Code (WAC 51-54A) with retrieval-augmented answers</strong></p>
+                                <p>Example searches: commercial kitchen fire suppression, emergency exits for assembly occupancies, fire extinguisher requirements</p>
                             </div>
                         </div>
 
