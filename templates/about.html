@@ -109,10 +109,11 @@
                                 <li>🔍 WAC (Washington Administrative Code) - No official API exists</li>
                                 <li>🔍 County Codes - No official APIs exist</li>
                                 <li>🔍 Research &amp; News - Real-time web search</li>
-                                <li><strong>RAG-Powered Search (Fire Code):</strong></li>
-                                <li>🔥 Fire Code - Retrieval-Augmented Generation using local vector database</li>
-                                <li>Searches 82 sections of WAC 51-54A (Washington State Fire Code)</li>
-                                <li>Provides answers with specific page citations</li>
+                                <li><strong>RAG-Powered Search (Building Codes):</strong></li>
+                                <li>🏗️ Building Codes - Retrieval-Augmented Generation using local vector database</li>
+                                <li>Searches 796 sections across 12 Washington Administrative Codes (WAC Title 51)</li>
+                                <li>Includes: Fire, Building, Residential, Mechanical, Plumbing, Energy, and Administrative codes</li>
+                                <li>Provides answers with specific code citations and page numbers</li>
                                 <li>Combines semantic search with Claude AI</li>
                             </ul>
                         </section>
@@ -164,7 +165,7 @@
 
                             <p class="api-note"><strong>Note:</strong> There are NO official APIs available for RCW text, WAC (Washington Administrative Code) text, or County Codes. For these, we use Perplexity AI to search the web and cite official sources.</p>
 
-                            <p class="api-note"><strong>Fire Code:</strong> Uses RAG (Retrieval-Augmented Generation) with a local vector database created from the official WAC 51-54A PDF. This is not an API but provides fast, accurate searches with page-level citations.</p>
+                            <p class="api-note"><strong>Building Codes:</strong> Uses RAG (Retrieval-Augmented Generation) with a local vector database created from 12 official WAC Title 51 PDFs (Fire, Building, Residential, Mechanical, Plumbing, Energy, and Administrative codes). This is not an API but provides fast, accurate searches across all building codes with specific code and page citations.</p>
                         </div>
 
                         <section class="about-card">
@@ -174,13 +175,14 @@
                                 <li>Web Research tabs use Perplexity to search the internet and cite sources.</li>
                                 <li>All web research results include clickable source links.</li>
                                 <li>
-                                    <p class="about-how-lead"><strong>Fire Code RAG:</strong> The Fire Code tab uses Retrieval-Augmented Generation (RAG) technology. The complete WAC 51-54A Fire Code PDF has been processed into a searchable vector database. When you ask a question, the system:</p>
+                                    <p class="about-how-lead"><strong>Building Codes RAG:</strong> The Building Codes tab uses Retrieval-Augmented Generation (RAG) technology. All 12 WAC Title 51 building codes have been processed into a searchable vector database:</p>
                                     <ol class="about-how-steps">
-                                        <li>Searches the database for relevant Fire Code sections</li>
-                                        <li>Retrieves the top 3 most relevant passages</li>
-                                        <li>Sends those specific sections to Claude AI</li>
-                                        <li>Claude generates an answer citing exact page numbers</li>
+                                        <li>WAC 51-04 (Policies), 51-05 (Surcharges), 51-06 (Records), 51-16 (Guidelines)</li>
+                                        <li>WAC 51-50 (Building Code), 51-51 (Residential Code), 51-52 (Mechanical Code)</li>
+                                        <li>WAC 51-54A (Fire Code), 51-55 (Wildland Code), 51-56 (Plumbing Code)</li>
+                                        <li>WAC 51-11C (Energy Commercial), 51-11R (Energy Residential)</li>
                                     </ol>
+                                    <p>When you ask a question, the system searches all codes simultaneously and retrieves the most relevant sections, then Claude generates an answer citing exact codes and page numbers.</p>
                                 </li>
                             </ul>
                         </section>
@@ -202,11 +204,11 @@
                                 <li>For official WAC codes, visit: <a href="https://apps.leg.wa.gov/wac" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac</a></li>
                                 <li>For official county codes, visit your county's website.</li>
                                 <li>This tool is for research purposes, not legal advice.</li>
-                                <li><strong>Fire Code RAG Limitations:</strong></li>
-                                <li>Based on the 2021 edition of WAC 51-54A (may not reflect newer amendments)</li>
+                                <li><strong>Building Codes RAG Limitations:</strong></li>
+                                <li>Based on 2021 editions of WAC Title 51 codes (may not reflect newer amendments)</li>
                                 <li>Searches semantic meaning, not exact keyword matching</li>
-                                <li>Always verify critical fire safety requirements with official sources</li>
-                                <li>For official Fire Code: <a href="https://apps.leg.wa.gov/wac/default.aspx?cite=51-54" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac/default.aspx?cite=51-54</a></li>
+                                <li>Always verify critical requirements with official sources</li>
+                                <li>For official codes: <a href="https://apps.leg.wa.gov/wac/default.aspx?cite=51" target="_blank" rel="noopener noreferrer">apps.leg.wa.gov/wac/default.aspx?cite=51</a></li>
                             </ul>
                         </section>
 

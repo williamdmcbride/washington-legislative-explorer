@@ -223,11 +223,11 @@ document.addEventListener('DOMContentLoaded', function() {
         firecodeSearchBtn.addEventListener('click', () => {
             const searchTerm = firecodeSearchInput.value.trim();
             if (!searchTerm) {
-                alert('Please enter a fire code question');
+                alert('Please enter a building codes question');
                 return;
             }
 
-            searchFireCode(searchTerm);
+            searchBuildingCodes(searchTerm);
         });
 
         firecodeSearchInput.addEventListener('keypress', (e) => {
@@ -388,10 +388,10 @@ function searchCountyCodes(searchTerm) {
     });
 }
 
-function searchFireCode(searchTerm) {
+function searchBuildingCodes(searchTerm) {
     showLoading();
 
-    fetch('/api/search/fire-code', {
+    fetch('/api/search/building-codes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -411,7 +411,7 @@ function searchFireCode(searchTerm) {
     })
     .catch(error => {
         hideLoading();
-        displayError('Error searching Fire Code: ' + error.message);
+        displayError('Error searching Building Codes: ' + error.message);
     });
 }
 
@@ -617,12 +617,9 @@ function buildCitationListHtml(citations) {
         const url = (c && c.url) ? String(c.url).trim() : '';
         const title = ((c && c.title) ? String(c.title).trim() : '') || url;
 
-        // Handle Fire Code page references
+        // Handle Building Codes page references (title includes WAC cite + page)
         if (url && url.startsWith('#page-')) {
-            const pageNum = url.replace('#page-', '');
-            items.push(
-                `<li>WAC 51-54A Page ${escapeHtml(pageNum)}</li>`
-            );
+            items.push(`<li>${escapeHtml(title)}</li>`);
             return;
         }
 
@@ -685,7 +682,7 @@ function getSourceBadgesHtml(result, opts = {}) {
 
     if (isCommittee) {
         badges.push('<span class="result-badge result-badge--live">✅ Live API Data</span>');
-    } else if (result.ResearchType === 'fire_code_rag') {
+    } else if (result.ResearchType === 'building_codes_rag') {
         badges.push('<span class="result-badge result-badge--web">🔍 RAG</span>');
     } else if (isWebResearch) {
         badges.push('<span class="result-badge result-badge--web">🔍 Web Research</span>');
@@ -777,7 +774,7 @@ function displayResults(results) {
 
         const isWebResearch = result.ResearchType === 'wac_web_research'
             || result.ResearchType === 'county_web_research';
-        const isFireCodeRag = result.ResearchType === 'fire_code_rag';
+        const isBuildingCodesRag = result.ResearchType === 'building_codes_rag';
         const titleRaw = resolveResultTitle(result);
         const committee = isCommitteeCard(result);
         let html = '';
@@ -806,7 +803,7 @@ function displayResults(results) {
             return;
         }
 
-        if (isFireCodeRag) {
+        if (isBuildingCodesRag) {
             html += `
                 <div class="result-title-row">
                     <h3 class="result-title">${escapeHtml(String(titleRaw))}</h3>

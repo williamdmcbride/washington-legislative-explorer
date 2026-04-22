@@ -25,22 +25,22 @@ from anthropic import Anthropic
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
-# Initialize Chroma client for Fire Code
-CHROMA_PATH = "data/chroma_fire_code"
+# Initialize Chroma client for Washington Building Codes (WAC Title 51)
+CHROMA_PATH = "data/chroma_building_codes"
 chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
 embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"
 )
 
 try:
-    fire_code_collection = chroma_client.get_collection(
-        name="fire_code",
+    building_codes_collection = chroma_client.get_collection(
+        name="building_codes",
         embedding_function=embedding_fn
     )
-    print(f"✅ Loaded Fire Code database: {fire_code_collection.count()} chunks")
+    print(f"✅ Loaded Building Codes database: {building_codes_collection.count()} chunks")
 except Exception as e:
-    print(f"⚠️  Fire Code database not found: {e}")
-    fire_code_collection = None
+    print(f"⚠️  Building Codes database not found: {e}")
+    building_codes_collection = None
 
 anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY")) if os.getenv("ANTHROPIC_API_KEY") else None
 
@@ -200,12 +200,12 @@ Be specific, actionable, and concise. Format your response in clear sections."""
     return call_claude_api_with_retry(client, prompt, max_tokens=1500)
 
 
-def search_fire_code(query, n_results=3):
-    """Search Fire Code using RAG"""
-    if not fire_code_collection:
+def search_building_codes(query, n_results=3):
+    """Search Washington Building Codes using RAG"""
+    if not building_codes_collection:
         return {
             'success': False,
-            'error': 'Fire Code database not initialized. Run process_fire_code.py first.'
+            'error': 'Building Codes database not initialized. Run process_building_codes.py first.'
         }
 
     if not anthropic_client:
@@ -216,7 +216,7 @@ def search_fire_code(query, n_results=3):
 
     try:
         # Search vector database
-        results = fire_code_collection.query(
+        results = building_codes_collection.query(
             query_texts=[query],
             n_results=n_results
         )
@@ -234,31 +234,41 @@ def search_fire_code(query, n_results=3):
                 chunks.append({
                     'text': doc,
                     'page': metadata.get('page', 'Unknown'),
-                    'source': metadata.get('source', 'WAC 51-54A')
+                    'source': metadata.get('source', 'WAC Title 51'),
                 })
 
         if not chunks:
             return {
                 'success': False,
-                'error': 'No relevant sections found in Fire Code.'
+                'error': 'No relevant sections found in the Washington Building Codes.'
             }
 
         # Limit each chunk to ~500 chars to avoid rate limits
         context = "\n\n---\n\n".join([
-            f"[Page {c['page']}]\n{c['text'][:500]}..." for c in chunks
+            f"[{c['source']}] [Page {c['page']}]\n{c['text'][:500]}..." for c in chunks
         ])
 
         # Create Claude prompt
-        prompt = f"""You are a helpful assistant for the Washington State Fire Code (WAC 51-54A).
+        prompt = f"""You are a helpful assistant for the Washington Building Codes (WAC Title 51).
 
-Based on the following sections from the Fire Code, answer the user's question. Always cite the specific page numbers in your response.
+Based on the following sections from the Building Codes, answer the user's question. 
 
-FIRE CODE SECTIONS:
+IMPORTANT: 
+1. Include the relevant excerpts in your response so the user can read them directly
+2. Always cite the specific WAC code and page numbers
+3. If the sections don't fully answer the question, say so and show what information IS available
+
+BUILDING CODE SECTIONS:
 {context}
 
 USER QUESTION: {query}
 
-Provide a clear, accurate answer based on the Fire Code sections above. Always cite page numbers like this: (Page 5) or (Pages 5-7). If the sections don't fully answer the question, say so."""
+Format your response as:
+1. Direct answer (if available)
+2. Relevant excerpts from the codes (quote the actual text)
+3. Source citations (WAC code and page numbers)
+
+If the sections don't contain the specific information requested, show what related information IS available in the excerpts."""
 
         # Call Claude API
         message = anthropic_client.messages.create(
@@ -276,23 +286,26 @@ Provide a clear, accurate answer based on the Fire Code sections above. Always c
         return {
             'success': True,
             'data': {
-                'BillId': '🔥 Fire Code Search',
-                'ResearchType': 'fire_code_rag',
+                'BillId': 'Building Codes Search',
+                'ResearchType': 'building_codes_rag',
                 'LongDescription': answer,
                 'Citations': [
                     {
-                        'title': f"WAC 51-54A Page {c['page']}",
+                        'title': f"{c['source']} Page {c['page']}",
                         'url': f"#page-{c['page']}"
                     } for c in chunks
                 ],
-                'DataSourceNote': f'Retrieved from {len(chunks)} relevant sections of WAC 51-54A (Washington State Fire Code)'
+                'DataSourceNote': (
+                    f'Retrieved from {len(chunks)} relevant sections of '
+                    f'Washington Building Codes (WAC Title 51)'
+                )
             }
         }
 
     except Exception as e:
         return {
             'success': False,
-            'error': f'Error searching Fire Code: {str(e)}'
+            'error': f'Error searching Building Codes: {str(e)}'
         }
 
 
@@ -621,9 +634,9 @@ def search_rcw():
         }), 500
 
 
-@app.route('/api/search/fire-code', methods=['POST'])
-def api_search_fire_code():
-    """Fire Code RAG search endpoint"""
+@app.route('/api/search/building-codes', methods=['POST'])
+def api_search_building_codes():
+    """Washington Building Codes RAG search endpoint"""
     try:
         data = request.get_json()
         query = data.get('search_term', '').strip()
@@ -634,7 +647,7 @@ def api_search_fire_code():
                 'error': 'Please enter a search query'
             })
 
-        result = search_fire_code(query)
+        result = search_building_codes(query)
         return jsonify(result)
 
     except Exception as e:
